@@ -1,0 +1,25 @@
+{
+  "dock_apps": [
+    "com.amazon.amazonvideo.livingroom",
+    "com.netflix.mediaclient",
+    "com.cbs.ott",
+    "com.wbd.stream",
+    "com.disney.disneyplus"
+  ],
+  "library_apps": [
+    "com.netflix.mediaclient"
+  ],
+  "fill_dock": false,
+  "background_color": "#0A0B1E",
+  "wallpaper": true,
+  "cinematic_home": true,
+  "dock_glass": true,
+  "icon_only_buttons": true,
+  "app_glow": true,
+  "glow_style": "horizon",
+  "focus_overshoot": false,
+  "advanced_effects": true,
+  "app_banners": [
+    "com.netflix.mediaclient=banner_netflix"
+  ]
+}

@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Projector remote</title>
+<style>
+@font-face{font-family:"Jost";src:url(/Jost.ttf);font-weight:100 900}
+:root{
+  --ink:#0A0B1E;--panel:#14163A;--edge:#2A2D63;--text:#EDEAF6;--dim:#8A8FB8;
+  --neon:#57C8FF;--magenta:#A0416B;--ok:#3DDC97;--bad:#FF6B6B;
+  --display:"Jost","Futura",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:radial-gradient(120% 80% at 50% 0%,#2E3480 0%,#12143A 45%,var(--ink) 100%) fixed;color:var(--text);font-family:var(--display);display:grid;place-items:center;padding:24px 16px}
+.remote{width:100%;max-width:360px;background:var(--panel);border:1px solid var(--edge);border-radius:36px;padding:26px 24px 24px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+h1{font-size:22px;font-weight:500;letter-spacing:.2px}
+.state{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--dim)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--dim)}
+.state.on .dot{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.state.off .dot{background:var(--bad)}
+button{font:inherit;color:var(--text);background:#1C1F4D;border:1px solid var(--edge);border-radius:18px;cursor:pointer;transition:transform .12s ease,background .15s ease,border-color .15s ease}
+button:hover{background:#252962}
+button:active,button.hit{transform:scale(.94);background:var(--neon);border-color:var(--neon);color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--neon);outline-offset:3px}
+.pad{position:relative;width:236px;height:236px;margin:0 auto 22px;border-radius:50%;background:#101238;border:1px solid var(--edge)}
+.pad button{position:absolute;display:grid;place-items:center;border-radius:50%;background:transparent;border-color:transparent}
+.pad button:hover{background:#1C1F4D}
+.pad svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pad .up,.pad .down{left:78px;width:80px;height:68px}
+.pad .left,.pad .right{top:78px;width:68px;height:80px}
+.pad .up{top:6px}.pad .down{bottom:6px}.pad .left{left:6px}.pad .right{right:6px}
+.pad .ok{left:78px;top:78px;width:80px;height:80px;background:#1C1F4D;border:1px solid var(--edge);font-size:20px;font-weight:600}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.row button{height:54px;font-size:16px}
+.vol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:18px 0}
+.vol button{height:54px;font-size:22px;font-weight:500}
+.vol .mute{font-size:15px}
+.text{display:flex;gap:10px;margin-top:6px}
+.text input{flex:1;min-width:0;height:48px;border-radius:16px;border:1px solid var(--edge);background:#101238;color:var(--text);padding:0 16px;font:inherit;font-size:16px}
+.text input::placeholder{color:var(--dim)}
+.text button{height:48px;padding:0 20px;font-size:16px}
+footer{margin-top:20px;display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:13px}
+footer .power{height:36px;padding:0 16px;font-size:14px;border-color:#5a2a3a;color:#ff9aa8}
+footer .power.arm{background:var(--bad);border-color:var(--bad);color:var(--ink)}
+.toast{min-height:20px;margin-top:12px;text-align:center;font-size:14px;color:var(--bad)}
+@media (prefers-reduced-motion:reduce){button{transition:none}}
+</style>
+</head>
+<body>
+<main class="remote">
+  <header>
+    <h1>Projector</h1>
+    <div class="state" id="state"><span class="dot"></span><span id="stateText">Checking</span></div>
+  </header>
+
+  <div class="pad">
+    <button class="up" data-key="up" aria-label="Up"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+    <button class="left" data-key="left" aria-label="Left"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="ok" data-key="ok" aria-label="OK">OK</button>
+    <button class="right" data-key="right" aria-label="Right"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button class="down" data-key="down" aria-label="Down"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+  </div>
+
+  <div class="row">
+    <button data-key="back">Back</button>
+    <button data-key="home">Home</button>
+    <button data-key="menu">Menu</button>
+  </div>
+  <div class="row">
+    <button data-key="rewind" aria-label="Rewind">&laquo;</button>
+    <button data-key="playpause">Play</button>
+    <button data-key="forward" aria-label="Fast forward">&raquo;</button>
+  </div>
+
+  <div class="vol">
+    <button data-key="voldown" aria-label="Volume down">&minus;</button>
+    <button class="mute" data-key="mute">Mute</button>
+    <button data-key="volup" aria-label="Volume up">+</button>
+  </div>
+
+  <form class="text" id="textForm">
+    <input id="textBox" type="text" placeholder="Type into the projector" autocomplete="off" maxlength="120">
+    <button type="submit">Send</button>
+  </form>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <footer>
+    <span>Arrows, Enter, Esc, H, + &minus; M</span>
+    <button class="power" id="power" type="button">Power</button>
+  </footer>
+</main>
+<script>
+const toast=document.getElementById('toast'),state=document.getElementById('state'),stateText=document.getElementById('stateText');
+let toastTimer;
+function say(msg){toast.textContent=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.textContent='',3500)}
+function setState(on){state.className='state '+(on?'on':'off');stateText.textContent=on?'Connected':'Not reachable'}
+async function post(path,body){
+  try{
+    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-Remote':'1'},body:JSON.stringify(body)});
+    const j=await r.json();
+    setState(j.ok||j.error!=='projector not reachable');
+    if(!j.ok)say(j.error||'That did not work');
+    return j.ok;
+  }catch(e){setState(false);say('The remote server is not running');return false}
+}
+function press(key){
+  const b=document.querySelector('[data-key="'+key+'"]');
+  if(b){b.classList.add('hit');setTimeout(()=>b.classList.remove('hit'),110)}
+  return post('/key',{key});
+}
+document.querySelectorAll('[data-key]').forEach(b=>b.addEventListener('click',()=>press(b.dataset.key)));
+document.getElementById('textForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const box=document.getElementById('textBox');
+  if(box.value.trim()&&await post('/text',{text:box.value}))box.value='';
+});
+const power=document.getElementById('power');let armed=false,armTimer;
+power.addEventListener('click',()=>{
+  if(!armed){armed=true;power.classList.add('arm');power.textContent='Press again';armTimer=setTimeout(disarm,3000);return}
+  disarm();press('power');
+});
+function disarm(){armed=false;clearTimeout(armTimer);power.classList.remove('arm');power.textContent='Power'}
+const map={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',Enter:'ok',Escape:'back',Backspace:'back',h:'home',H:'home','+':'volup','=':'volup','-':'voldown',_:'voldown',m:'mute',M:'mute',' ':'playpause'};
+addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.metaKey||e.ctrlKey||e.altKey)return;
+  const k=map[e.key];
+  if(!k)return;
+  e.preventDefault();
+  if(e.repeat&&!/^(up|down|left|right|volup|voldown)$/.test(k))return;
+  press(k);
+});
+async function poll(){
+  try{const r=await fetch('/status');const j=await r.json();setState(j.online)}catch(e){setState(false)}
+}
+poll();setInterval(poll,15000);
+</script>
+</body>
+</html>
